@@ -41,7 +41,17 @@
               rustc
               rustfmt
               clippy
+              rust-analyzer
             ];
+
+            shellHook = ''
+              if [[ -f .env ]]
+              then
+                source .env
+              else
+                echo "Could not find the .env file"
+              fi
+            '';
           };
         }
       );

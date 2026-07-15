@@ -1,3 +1,4 @@
+use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 use std::collections::HashMap;
 
@@ -8,12 +9,12 @@ use std::collections::HashMap;
     default_member_permissions = "MANAGE_ROLES"
 )]
 pub async fn reactionrole(
-    ctx: crate::Context<'_>,
+    ctx: Context<'_>,
     #[description = "Role to give"] role: serenity::Role,
     #[description = "Emoji to react with"] emoji: String,
     #[description = "Content for a new message"] message_content: Option<String>,
     #[description = "ID of an existing message to react to instead"] message_id: Option<String>,
-) -> Result<(), crate::Error> {
+) -> Result<(), Error> {
     ctx.defer_ephemeral().await?;
 
     let msg = match (message_content, message_id) {

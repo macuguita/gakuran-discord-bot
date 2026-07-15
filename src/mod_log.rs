@@ -1,19 +1,13 @@
 use poise::serenity_prelude as serenity;
-use std::collections::HashMap;
 
-pub type ModLogConfig = HashMap<serenity::GuildId, serenity::ChannelId>;
+pub type ModLogConfig = crate::ChannelConfig;
 
 pub fn save(data: &ModLogConfig) -> anyhow::Result<()> {
-    let json = serde_json::to_string_pretty(data)?;
-    std::fs::write("mod_log.json", json)?;
-    Ok(())
+    crate::save_channel_config(data, "mod_log.json")
 }
 
 pub fn load() -> ModLogConfig {
-    std::fs::read_to_string("mod_log.json")
-        .ok()
-        .and_then(|s| serde_json::from_str(&s).ok())
-        .unwrap_or_default()
+    crate::load_channel_config("mod_log.json")
 }
 
 #[allow(clippy::unreadable_literal)]
