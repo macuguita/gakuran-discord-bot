@@ -42,6 +42,7 @@
               rustfmt
               clippy
               rust-analyzer
+              sqlx-cli
             ];
             
             RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";

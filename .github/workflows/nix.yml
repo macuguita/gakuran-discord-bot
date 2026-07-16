@@ -22,6 +22,10 @@ on:
       - "Cargo.toml"
       - "Cargo.lock"
 
+      # Folders
+      - ".sqlx"
+      - "migrations"
+
       # Workflows
       - ".github/workflows/nix.yml"
   pull_request:
@@ -37,6 +41,10 @@ on:
       # Files
       - "Cargo.toml"
       - "Cargo.lock"
+      
+      # Folders
+      - ".sqlx"
+      - "migrations"
 
       # Workflows
       - ".github/workflows/nix.yml"

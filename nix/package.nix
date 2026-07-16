@@ -13,6 +13,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
     root = ../.;
     fileset = fs.unions [
       ../src
+      ../.sqlx
+      ../migrations
       ../Cargo.lock
       ../Cargo.toml
     ];

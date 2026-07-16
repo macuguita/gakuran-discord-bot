@@ -1,6 +1,5 @@
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
-use std::collections::HashMap;
 
 /// Post a reaction-role message, or attach one to an existing message
 #[poise::command(
@@ -45,11 +44,7 @@ pub async fn reactionrole(
 
     let key = format!("{}:{}", msg.id, emoji);
     if let Some(guild_id) = ctx.guild_id() {
-        let mut rr = ctx.data().reaction_roles.lock().await;
-        rr.entry(guild_id)
-            .or_insert_with(HashMap::new)
-            .insert(key, role.id.get());
-        crate::reaction_roles::save(&rr)?;
+        crate::db::set_reaction_role(&ctx.data().db, guild_id, &key, role.id.get()).await?;
     }
 
     ctx.say("Done!").await?;

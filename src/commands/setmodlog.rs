@@ -19,16 +19,12 @@ pub async fn setmodlog(
         return Ok(());
     };
 
-    let mut cfg = ctx.data().mod_log.lock().await;
-
     if let Some(channel) = channel {
-        cfg.insert(guild_id, channel.id());
-        crate::mod_log::save(&cfg)?;
+        crate::db::set_mod_log(&ctx.data().db, guild_id, channel.id()).await?;
         ctx.say(format!("Mod log set to <#{}>", channel.id()))
             .await?;
     } else {
-        cfg.remove(&guild_id);
-        crate::mod_log::save(&cfg)?;
+        crate::db::remove_mod_log(&ctx.data().db, guild_id).await?;
         ctx.say("Mod log disabled for this server.").await?;
     }
 

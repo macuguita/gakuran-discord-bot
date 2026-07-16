@@ -1,15 +1,5 @@
 use poise::serenity_prelude as serenity;
 
-pub type ModLogConfig = crate::ChannelConfig;
-
-pub fn save(data: &ModLogConfig) -> anyhow::Result<()> {
-    crate::save_channel_config(data, "mod_log.json")
-}
-
-pub fn load() -> ModLogConfig {
-    crate::load_channel_config("mod_log.json")
-}
-
 #[allow(clippy::unreadable_literal)]
 pub async fn handle_message_delete(
     ctx: &serenity::Context,
@@ -22,10 +12,9 @@ pub async fn handle_message_delete(
         return Ok(());
     };
 
-    let log_channel = {
-        let cfg = data.mod_log.lock().await;
-        cfg.get(&guild_id).copied()
-    };
+    let log_channel = crate::db::get_app_config(&data.db, guild_id)
+        .await?
+        .and_then(|c| c.mod_log_channel);
     let Some(log_channel) = log_channel else {
         return Ok(());
     }; // not configured for this guild
@@ -77,10 +66,9 @@ pub async fn handle_message_update(
         return Ok(());
     };
 
-    let log_channel = {
-        let cfg = data.mod_log.lock().await;
-        cfg.get(&guild_id).copied()
-    };
+    let log_channel = crate::db::get_app_config(&data.db, guild_id)
+        .await?
+        .and_then(|c| c.mod_log_channel);
     let Some(log_channel) = log_channel else {
         return Ok(());
     };

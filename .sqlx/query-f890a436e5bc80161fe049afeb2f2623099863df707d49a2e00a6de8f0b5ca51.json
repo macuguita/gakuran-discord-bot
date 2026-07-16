@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE applications SET status = ?, reviewed_by = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "f890a436e5bc80161fe049afeb2f2623099863df707d49a2e00a6de8f0b5ca51"
+}

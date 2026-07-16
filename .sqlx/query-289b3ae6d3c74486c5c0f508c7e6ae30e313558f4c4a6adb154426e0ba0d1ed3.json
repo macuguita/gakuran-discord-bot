@@ -1,0 +1,26 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT role_id FROM reaction_roles WHERE guild_id = ? AND message_key = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "role_id",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "reaction_roles",
+            "name": "role_id"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "289b3ae6d3c74486c5c0f508c7e6ae30e313558f4c4a6adb154426e0ba0d1ed3"
+}

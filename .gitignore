@@ -1,3 +1,4 @@
 /target
 /.direnv
+/gakuran-bot.db
 .env
