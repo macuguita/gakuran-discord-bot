@@ -12,8 +12,8 @@ pub async fn appconfig(
     #[description = "Channel where applications get sent for review"] application_channel: Option<
         serenity::Channel,
     >,
-    #[description = "Role given when an application is accepted"] role: Option<serenity::Role>,
-    #[description = "Channel where moderation actions get logged"] mod_log: Option<
+    #[description = "Role given when an application is accepted"] application_approved_role: Option<serenity::Role>,
+    #[description = "Channel where mesage modifications get logged"] mod_log: Option<
         serenity::Channel,
     >,
 ) -> Result<(), Error> {
@@ -24,7 +24,7 @@ pub async fn appconfig(
         return Ok(());
     };
 
-    if application_channel.is_none() && role.is_none() && mod_log.is_none() {
+    if application_channel.is_none() && application_approved_role.is_none() && mod_log.is_none() {
         ctx.say("Provide at least a channel, a role, or a mod log channel to update.")
             .await?;
         return Ok(());
@@ -35,7 +35,7 @@ pub async fn appconfig(
         guild_id,
         mod_log.as_ref().map(serenity::Channel::id),
         application_channel.as_ref().map(serenity::Channel::id),
-        role.as_ref().map(|r| r.id),
+        application_approved_role.as_ref().map(|r| r.id),
     )
     .await?;
 

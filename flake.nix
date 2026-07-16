@@ -44,15 +44,26 @@
               rust-analyzer
               sqlx-cli
             ];
-            
+
             RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
 
             shellHook = ''
-              if [[ -f .env ]]
-              then
+              if [[ -f .env ]]; then
                 source .env
               else
                 echo "Could not find the .env file"
+              fi
+
+              if [[ -n "$DATABASE_URL" ]]; then
+                if [[ ! -f gakuran-bot.db ]]; then
+                  echo "Setting up database for compile-time checks..."
+                  sqlx database create
+                  sqlx migrate run
+                else
+                  sqlx migrate run
+                fi
+              else
+                echo "DATABASE_URL not set, skipping database setup"
               fi
             '';
           };
