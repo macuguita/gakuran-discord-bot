@@ -9,8 +9,8 @@ const QUESTIONS: &[(&str, &str)] = &[
     ("uses_vc", "Do you mainly use voice chat or text chat?"),
     ("roleplay_availability", "How often are you available to roleplay?"),
     ("roleplay_experience", "Tell us about your roleplay experience."),
-    ("character_backstory", "Tell why a little bit about your character."),
-    ("why_join", "Tell us why you wanna join our community.."),
+    ("character_backstory", "Tell us a little bit about your character."),
+    ("why_join", "Tell us why you wanna join our community."),
 ];
 
 #[poise::command(slash_command)]
