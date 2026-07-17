@@ -118,7 +118,10 @@ pub async fn insert_application(
     Ok(id)
 }
 
-pub async fn get_application(pool: &SqlitePool, id: i64) -> Result<Option<Application>, sqlx::Error> {
+pub async fn get_application(
+    pool: &SqlitePool,
+    id: i64,
+) -> Result<Option<Application>, sqlx::Error> {
     sqlx::query_as!(
         Application,
         "SELECT id, user_id, in_game_name, status FROM applications WHERE id = ?",

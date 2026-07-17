@@ -12,7 +12,9 @@ pub async fn appconfig(
     #[description = "Channel where applications get sent for review"] application_channel: Option<
         serenity::Channel,
     >,
-    #[description = "Role given when an application is accepted"] application_approved_role: Option<serenity::Role>,
+    #[description = "Role given when an application is accepted"] application_approved_role: Option<
+        serenity::Role,
+    >,
     #[description = "Channel where mesage modifications get logged"] mod_log: Option<
         serenity::Channel,
     >,

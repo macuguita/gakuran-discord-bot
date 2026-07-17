@@ -2,21 +2,70 @@ use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 use std::time::Duration;
 
-const QUESTIONS: &[(&str, &str)] = &[
-    ("roblox_username", "What is your Roblox username?"),
-    ("in_game_name", "What is your in-game character's name?"),
-    ("character_backstory", "Tell us a little bit about your character."),
-    ("age", "How old are you?"),
-    ("uses_vc", "Do you mainly use voice chat or text chat?"),
-    ("roleplay_experience", "Tell us about your roleplay experience. Minimum of 2 sentences."),
-    ("why_join", "Tell us why you wanna join our community."),
-    ("rule", "What is the servers 3rd rule?"),
+struct Question {
+    key: &'static str,
+    prompt: &'static str,
+    min_len: Option<usize>,
+    max_len: Option<usize>,
+}
+
+const QUESTIONS: &[Question] = &[
+    Question {
+        key: "roblox_username",
+        prompt: "What is your Roblox username?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "in_game_name",
+        prompt: "What is your in-game character's name?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "character_backstory",
+        prompt: "Tell us a little bit about your character.",
+        min_len: Some(185),
+        max_len: None,
+    },
+    Question {
+        key: "age",
+        prompt: "How old are you?",
+        min_len: None,
+        max_len: Some(2),
+    },
+    Question {
+        key: "uses_vc",
+        prompt: "Do you mainly use voice chat or text chat?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "roleplay_experience",
+        prompt: "Tell us about your roleplay experience. Minimum of 2 sentences.",
+        min_len: Some(200),
+        max_len: None,
+    },
+    Question {
+        key: "why_join",
+        prompt: "Tell us why you wanna join our community.",
+        min_len: Some(150),
+        max_len: None,
+    },
+    Question {
+        key: "rule",
+        prompt: "What is the servers 3rd rule?",
+        min_len: Some(150),
+        max_len: None,
+    },
 ];
 
 #[poise::command(slash_command)]
+#[allow(clippy::too_many_lines)]
 pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
     let Some(guild_id) = ctx.guild_id() else {
-        ctx.say("This command can only be used inside of a server.").await?;
+        ctx.say("This command can only be used inside of a server.")
+            .await?;
         return Ok(());
     };
 
@@ -59,26 +108,64 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
     .await?;
 
     dm_channel
-        .say(ctx, "Let's get started on your application! You have 5 minutes per question.")
+        .say(
+            ctx,
+            "Let's get started on your application! You have 5 minutes per question.",
+        )
         .await?;
 
     let mut answers: Vec<(String, String)> = Vec::new();
 
-    for (key, prompt) in QUESTIONS {
-        dm_channel.say(ctx, *prompt).await?;
+    for q in QUESTIONS {
+        let prompt = match (q.min_len, q.max_len) {
+            (Some(min), Some(max)) => format!("{} (between {min} and {max} characters)", q.prompt),
+            (Some(min), None) => format!("{} (minimum {min} characters)", q.prompt),
+            (None, Some(max)) => format!("{} (maximum {max} characters)", q.prompt),
+            (None, None) => q.prompt.to_string(),
+        };
 
-        let reply = dm_channel
-            .id
-            .await_reply(ctx)
-            .author_id(ctx.author().id)
-            .timeout(Duration::from_mins(5))
-            .await;
+        dm_channel.say(ctx, prompt).await?;
 
-        if let Some(msg) = reply { answers.push(((*key).to_string(), msg.content.clone())) } else {
-            dm_channel
-                .say(ctx, "You took too long to respond. Use `/apply` to start again.")
-                .await?;
-            return Ok(());
+        loop {
+            let reply = dm_channel
+                .id
+                .await_reply(ctx)
+                .author_id(ctx.author().id)
+                .timeout(Duration::from_mins(5))
+                .await;
+
+            let Some(msg) = reply else {
+                dm_channel
+                    .say(
+                        ctx,
+                        "You took too long to respond. Use `/apply` to start again.",
+                    )
+                    .await?;
+                return Ok(());
+            };
+
+            let len = msg.content.chars().count();
+
+            if let Some(min) = q.min_len
+                && len < min
+            {
+                dm_channel
+                    .say(ctx, format!("That answer needs to be at least {min} characters (yours was {len}). Please try again."))
+                    .await?;
+                continue;
+            }
+
+            if let Some(max) = q.max_len
+                && len > max
+            {
+                dm_channel
+                    .say(ctx, format!("That answer needs to be at most {max} characters (yours was {len}). Please try again."))
+                    .await?;
+                continue;
+            }
+
+            answers.push((q.key.to_string(), msg.content.clone()));
+            break;
         }
     }
 
@@ -102,25 +189,43 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
     let mut embed = serenity::CreateEmbed::default()
         .title(author.name.clone())
         .field("Discord user", format!("<@{}>", author.id), false)
-        .footer(serenity::CreateEmbedFooter::new(format!("Application #{app_id}")))
+        .footer(serenity::CreateEmbedFooter::new(format!(
+            "Application #{app_id}"
+        )))
         .color(0x58_65_F2);
 
-    for (key, prompt) in QUESTIONS {
-        let value = answers.iter().find(|(k, _)| k == key).map(|(_, v)| v.clone()).unwrap_or_default();
-        embed = embed.field(*prompt, value, false);
+    for q in QUESTIONS {
+        let value = answers
+            .iter()
+            .find(|(k, _)| k == q.key)
+            .map(|(_, v)| v.clone())
+            .unwrap_or_default();
+        embed = embed.field(q.prompt, value, false);
     }
 
     let buttons = serenity::CreateActionRow::Buttons(vec![
-        serenity::CreateButton::new(format!("app_accept_{app_id}")).label("Accept").style(serenity::ButtonStyle::Success),
-        serenity::CreateButton::new(format!("app_deny_{app_id}")).label("Deny").style(serenity::ButtonStyle::Danger),
+        serenity::CreateButton::new(format!("app_accept_{app_id}"))
+            .label("Accept")
+            .style(serenity::ButtonStyle::Success),
+        serenity::CreateButton::new(format!("app_deny_{app_id}"))
+            .label("Deny")
+            .style(serenity::ButtonStyle::Danger),
     ]);
 
     channel_id
-        .send_message(ctx, serenity::CreateMessage::default().embed(embed).components(vec![buttons]))
+        .send_message(
+            ctx,
+            serenity::CreateMessage::default()
+                .embed(embed)
+                .components(vec![buttons]),
+        )
         .await?;
 
     dm_channel
-        .say(ctx, "Your application has been submitted! You'll be notified here once it's reviewed.")
+        .say(
+            ctx,
+            "Your application has been submitted! You'll be notified here once it's reviewed.",
+        )
         .await?;
 
     Ok(())
