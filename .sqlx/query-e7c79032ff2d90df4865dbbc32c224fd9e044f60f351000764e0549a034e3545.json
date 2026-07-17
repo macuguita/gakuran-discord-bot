@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM auto_delete_channels WHERE guild_id = ? AND channel_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "e7c79032ff2d90df4865dbbc32c224fd9e044f60f351000764e0549a034e3545"
+}

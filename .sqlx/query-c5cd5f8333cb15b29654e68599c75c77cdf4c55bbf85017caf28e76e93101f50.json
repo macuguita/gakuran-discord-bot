@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT OR IGNORE INTO auto_delete_channels (guild_id, channel_id) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "c5cd5f8333cb15b29654e68599c75c77cdf4c55bbf85017caf28e76e93101f50"
+}

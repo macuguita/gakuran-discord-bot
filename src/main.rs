@@ -5,6 +5,7 @@ mod db;
 mod embed;
 mod mod_log;
 mod reaction_roles;
+mod auto_delete;
 
 use anyhow::Result;
 use config::Config;
@@ -60,6 +61,9 @@ async fn event_handler(
             )
             .await?;
         }
+        serenity::FullEvent::Message { new_message } => {
+            auto_delete::handle_message(ctx, data, new_message).await?;
+        }
         _ => {}
     }
     Ok(())
@@ -82,6 +86,8 @@ async fn main() -> Result<()> {
                 commands::embed(),
                 commands::apply(),
                 commands::appconfig(),
+                commands::autodelete_add(),
+                commands::autodelete_remove(),
             ],
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))

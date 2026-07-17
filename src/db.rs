@@ -45,13 +45,13 @@ pub async fn set_app_config(
     pool: &SqlitePool,
     guild_id: serenity::GuildId,
     mod_log_channel: Option<serenity::ChannelId>,
-    channel: Option<serenity::ChannelId>,
-    role: Option<serenity::RoleId>,
+    response_channel: Option<serenity::ChannelId>,
+    accepted_role: Option<serenity::RoleId>,
 ) -> Result<(), sqlx::Error> {
     let guild_id_str = guild_id.get().to_string();
     let mod_log_str = mod_log_channel.map(|c| c.get().to_string());
-    let channel_str = channel.map(|c| c.get().to_string());
-    let role_str = role.map(|r| r.get().to_string());
+    let response_channel_str = response_channel.map(|c| c.get().to_string());
+    let accepted_role_str = accepted_role.map(|r| r.get().to_string());
 
     sqlx::query!(
         "INSERT INTO app_config (guild_id, mod_log_channel_id, response_channel_id, accepted_role_id) VALUES (?, ?, ?, ?)
@@ -61,12 +61,63 @@ pub async fn set_app_config(
             accepted_role_id = COALESCE(excluded.accepted_role_id, app_config.accepted_role_id)",
         guild_id_str,
         mod_log_str,
-        channel_str,
-        role_str
+        response_channel_str,
+        accepted_role_str
     )
     .execute(pool)
     .await?;
     Ok(())
+}
+
+pub async fn add_auto_delete_channel(
+    pool: &SqlitePool,
+    guild_id: serenity::GuildId,
+    channel_id: serenity::ChannelId,
+) -> Result<(), sqlx::Error> {
+    let guild_id_str = guild_id.get().to_string();
+    let channel_id_str = channel_id.get().to_string();
+    sqlx::query!(
+        "INSERT OR IGNORE INTO auto_delete_channels (guild_id, channel_id) VALUES (?, ?)",
+        guild_id_str,
+        channel_id_str
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn remove_auto_delete_channel(
+    pool: &SqlitePool,
+    guild_id: serenity::GuildId,
+    channel_id: serenity::ChannelId,
+) -> Result<(), sqlx::Error> {
+    let guild_id_str = guild_id.get().to_string();
+    let channel_id_str = channel_id.get().to_string();
+    sqlx::query!(
+        "DELETE FROM auto_delete_channels WHERE guild_id = ? AND channel_id = ?",
+        guild_id_str,
+        channel_id_str
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+pub async fn is_auto_delete_channel(
+    pool: &SqlitePool,
+    guild_id: serenity::GuildId,
+    channel_id: serenity::ChannelId,
+) -> Result<bool, sqlx::Error> {
+    let guild_id_str = guild_id.get().to_string();
+    let channel_id_str = channel_id.get().to_string();
+    let count: i64 = sqlx::query_scalar!(
+        "SELECT COUNT(*) FROM auto_delete_channels WHERE guild_id = ? AND channel_id = ?",
+        guild_id_str,
+        channel_id_str
+    )
+    .fetch_one(pool)
+    .await?;
+    Ok(count > 0)
 }
 
 // Using the struct for the query_as! macro, some stuff is unused...
