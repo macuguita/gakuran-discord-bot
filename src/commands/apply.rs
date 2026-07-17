@@ -1,6 +1,7 @@
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 use std::time::Duration;
+use std::fmt::Write;
 
 struct Question {
     key: &'static str,
@@ -55,7 +56,7 @@ const QUESTIONS: &[Question] = &[
     Question {
         key: "rule",
         prompt: "What is the servers 3rd rule?",
-        min_len: Some(150),
+        min_len: None,
         max_len: None,
     },
 ];
@@ -186,22 +187,31 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
     .await?;
 
     let author = ctx.author();
-    let mut embed = serenity::CreateEmbed::default()
-        .title(author.name.clone())
-        .field("Discord user", format!("<@{}>", author.id), false)
-        .footer(serenity::CreateEmbedFooter::new(format!(
-            "Application #{app_id}"
-        )))
-        .color(0x58_65_F2);
 
+    let mut transcript = format!("Application from {} ({})\n\n", author.name, author.id);
     for q in QUESTIONS {
         let value = answers
             .iter()
             .find(|(k, _)| k == q.key)
             .map(|(_, v)| v.clone())
             .unwrap_or_default();
-        embed = embed.field(q.prompt, value, false);
+        let _ = write!(transcript, "**{}**\n{}\n\n", q.prompt, value);
     }
+
+    let attachment = serenity::CreateAttachment::bytes(
+        transcript.into_bytes(),
+        format!("application_{app_id}.md"),
+    );
+
+    let embed = serenity::CreateEmbed::default()
+        .title(format!("Application from {}", author.name))
+        .field("Discord user", format!("<@{}>", author.id), true)
+        .field("In-game name", &in_game_name, true)
+        .description("Full responses attached below.")
+        .footer(serenity::CreateEmbedFooter::new(format!(
+            "Application #{app_id}"
+        )))
+        .color(0x58_65_F2);
 
     let buttons = serenity::CreateActionRow::Buttons(vec![
         serenity::CreateButton::new(format!("app_accept_{app_id}"))
@@ -217,7 +227,8 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
             ctx,
             serenity::CreateMessage::default()
                 .embed(embed)
-                .components(vec![buttons]),
+                .components(vec![buttons])
+                .add_file(attachment),
         )
         .await?;
 
