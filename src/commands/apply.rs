@@ -5,12 +5,12 @@ use std::time::Duration;
 const QUESTIONS: &[(&str, &str)] = &[
     ("roblox_username", "What is your Roblox username?"),
     ("in_game_name", "What is your in-game character's name?"),
-    ("age", "What is your real age?"),
-    ("uses_vc", "Do you mainly use voice chat or text chat?"),
-    ("roleplay_availability", "How often are you available to roleplay?"),
-    ("roleplay_experience", "Tell us about your roleplay experience."),
     ("character_backstory", "Tell us a little bit about your character."),
+    ("age", "How old are you?"),
+    ("uses_vc", "Do you mainly use voice chat or text chat?"),
+    ("roleplay_experience", "Tell us about your roleplay experience. Minimum of 2 sentences."),
     ("why_join", "Tell us why you wanna join our community."),
+    ("rule", "What is the servers 3rd rule?"),
 ];
 
 #[poise::command(slash_command)]
