@@ -73,13 +73,8 @@ pub async fn set_app_config(
 #[allow(dead_code)]
 pub struct Application {
     pub id: i64,
-    pub guild_id: String,
     pub user_id: String,
-    pub roblox_username: String,
     pub in_game_name: String,
-    pub age: String,
-    pub uses_vc: String,
-    pub roleplay_availability: String,
     pub status: String,
 }
 
@@ -105,46 +100,32 @@ pub async fn insert_application(
     pool: &SqlitePool,
     guild_id: serenity::GuildId,
     user_id: serenity::UserId,
-    roblox_username: &str,
     in_game_name: &str,
-    age: &str,
-    uses_vc: &str,
-    roleplay_availability: &str,
+    answers_json: &str,
 ) -> Result<i64, sqlx::Error> {
     let guild_id_str = guild_id.get().to_string();
     let user_id_str = user_id.get().to_string();
     let id = sqlx::query!(
-        "INSERT INTO applications
-            (guild_id, user_id, roblox_username, in_game_name, age, uses_vc, roleplay_availability)
-         VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO applications (guild_id, user_id, in_game_name, answers) VALUES (?, ?, ?, ?)",
         guild_id_str,
         user_id_str,
-        roblox_username,
         in_game_name,
-        age,
-        uses_vc,
-        roleplay_availability
+        answers_json
     )
     .execute(pool)
     .await?
     .last_insert_rowid();
-
     Ok(id)
 }
 
-pub async fn get_application(
-    pool: &SqlitePool,
-    id: i64,
-) -> Result<Option<Application>, sqlx::Error> {
-    let row = sqlx::query_as!(
+pub async fn get_application(pool: &SqlitePool, id: i64) -> Result<Option<Application>, sqlx::Error> {
+    sqlx::query_as!(
         Application,
-        "SELECT id, guild_id, user_id, roblox_username, in_game_name, age, uses_vc, roleplay_availability, status
-         FROM applications WHERE id = ?",
+        "SELECT id, user_id, in_game_name, status FROM applications WHERE id = ?",
         id
     )
     .fetch_optional(pool)
-    .await?;
-    Ok(row)
+    .await
 }
 
 pub async fn set_application_status(

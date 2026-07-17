@@ -16,11 +16,8 @@ CREATE TABLE IF NOT EXISTS applications (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     guild_id TEXT NOT NULL,
     user_id TEXT NOT NULL,
-    roblox_username TEXT NOT NULL,
     in_game_name TEXT NOT NULL,
-    age TEXT NOT NULL,
-    uses_vc TEXT NOT NULL,
-    roleplay_availability TEXT NOT NULL,
+    answers TEXT NOT NULL, -- JSON array of [key, answer] pairs
     status TEXT NOT NULL DEFAULT 'pending',
     reviewed_by TEXT,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))

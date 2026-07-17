@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO applications (guild_id, user_id, in_game_name, answers) VALUES (?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "10bb998361bfa5d6511f72b484a71ded96f2d0e9036714f86d35767dc6375712"
+}
