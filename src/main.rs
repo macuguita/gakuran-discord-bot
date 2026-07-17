@@ -95,10 +95,10 @@ async fn main() -> Result<()> {
         .setup(move |ctx, _ready, framework| {
             let db_pool = db_pool.clone();
             Box::pin(async move {
-                let guild_id = serenity::GuildId::new(1525578372367777945);
-                poise::builtins::register_in_guild(ctx, &framework.options().commands, guild_id)
-                    .await?;
-                // poise::builtins::register_globally(ctx, &framework.options().commands).await?;1
+                // let guild_id = serenity::GuildId::new(1525578372367777945);
+                // poise::builtins::register_in_guild(ctx, &framework.options().commands, guild_id)
+                //     .await?;
+                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data {
                     db: db_pool,
                     embed_drafts: tokio::sync::Mutex::new(HashMap::new()),
