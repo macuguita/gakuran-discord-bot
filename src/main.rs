@@ -1,11 +1,11 @@
 mod applications;
+mod auto_delete;
 mod commands;
 mod config;
 mod db;
 mod embed;
 mod mod_log;
 mod reaction_roles;
-mod auto_delete;
 
 use anyhow::Result;
 use config::Config;

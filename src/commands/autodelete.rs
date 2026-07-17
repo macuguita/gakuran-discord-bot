@@ -16,7 +16,11 @@ pub async fn autodelete_add(
         return Ok(());
     };
     crate::db::add_auto_delete_channel(&ctx.data().db, guild_id, channel.id()).await?;
-    ctx.say(format!("Messages in <#{}> will now be auto-deleted.", channel.id())).await?;
+    ctx.say(format!(
+        "Messages in <#{}> will now be auto-deleted.",
+        channel.id()
+    ))
+    .await?;
     Ok(())
 }
 
@@ -35,6 +39,10 @@ pub async fn autodelete_remove(
         return Ok(());
     };
     crate::db::remove_auto_delete_channel(&ctx.data().db, guild_id, channel.id()).await?;
-    ctx.say(format!("Messages in <#{}> will no longer be auto-deleted.", channel.id())).await?;
+    ctx.say(format!(
+        "Messages in <#{}> will no longer be auto-deleted.",
+        channel.id()
+    ))
+    .await?;
     Ok(())
 }

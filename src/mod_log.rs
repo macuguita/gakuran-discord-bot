@@ -19,6 +19,10 @@ pub async fn handle_message_delete(
         return Ok(());
     }; // not configured for this guild
 
+    if crate::db::is_auto_delete_channel(&data.db, guild_id, channel_id).await? {
+        return Ok(());
+    }
+
     let cached = ctx
         .cache
         .message(channel_id, deleted_message_id)
@@ -71,11 +75,16 @@ pub async fn handle_message_update(
         .and_then(|c| c.mod_log_channel);
     let Some(log_channel) = log_channel else {
         return Ok(());
-    };
+    }; // not configured for this server
 
     let (Some(old), Some(new)) = (old_if_available, new) else {
         return Ok(());
     };
+
+    if crate::db::is_auto_delete_channel(&data.db, guild_id, new.channel_id).await? {
+        return Ok(());
+    }
+
     if old.content == new.content {
         return Ok(());
     }

@@ -1,7 +1,7 @@
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
-use std::time::Duration;
 use std::fmt::Write;
+use std::time::Duration;
 
 struct Question {
     key: &'static str,
