@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO guild_config (guild_id, mod_log_channel_id, response_channel_id, accepted_role_id) VALUES (?, ?, ?, ?)\n         ON CONFLICT(guild_id) DO UPDATE SET\n            mod_log_channel_id = COALESCE(excluded.mod_log_channel_id, guild_config.mod_log_channel_id),\n            response_channel_id = COALESCE(excluded.response_channel_id, guild_config.response_channel_id),\n            accepted_role_id = COALESCE(excluded.accepted_role_id, guild_config.accepted_role_id)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "a88596d0d6085b713dbe077ac9d6a188242ab585b68740cd17d4eb0a8b8f4f96"
+}

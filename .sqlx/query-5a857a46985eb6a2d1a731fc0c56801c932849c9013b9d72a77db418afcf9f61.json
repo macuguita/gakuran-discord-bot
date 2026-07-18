@@ -1,22 +1,11 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT id, user_id, in_game_name, status FROM applications WHERE id = ?",
+  "query": "SELECT user_id, in_game_name, status FROM applications WHERE id = ?",
   "describe": {
     "columns": [
       {
-        "name": "id",
-        "ordinal": 0,
-        "type_info": "Integer",
-        "origin": {
-          "Table": {
-            "table": "applications",
-            "name": "id"
-          }
-        }
-      },
-      {
         "name": "user_id",
-        "ordinal": 1,
+        "ordinal": 0,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -27,7 +16,7 @@
       },
       {
         "name": "in_game_name",
-        "ordinal": 2,
+        "ordinal": 1,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -38,7 +27,7 @@
       },
       {
         "name": "status",
-        "ordinal": 3,
+        "ordinal": 2,
         "type_info": "Text",
         "origin": {
           "Table": {
@@ -54,9 +43,8 @@
     "nullable": [
       false,
       false,
-      false,
       false
     ]
   },
-  "hash": "7deccfc7df0dedf30486f98962ff1ebd8976367637cb0610dde93c51a5beec2c"
+  "hash": "5a857a46985eb6a2d1a731fc0c56801c932849c9013b9d72a77db418afcf9f61"
 }

@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO reaction_roles (guild_id, message_id, emoji, role_id) VALUES (?, ?, ?, ?)\n         ON CONFLICT(guild_id, message_id, emoji) DO UPDATE SET role_id = excluded.role_id",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 4
+    },
+    "nullable": []
+  },
+  "hash": "95f6100b98413ce04f7fb2691295e66c779b2bc210e8b0726b71adc0518200a8"
+}

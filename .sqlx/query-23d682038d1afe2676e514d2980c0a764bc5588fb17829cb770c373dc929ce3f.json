@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "SELECT mod_log_channel_id, response_channel_id, accepted_role_id FROM app_config WHERE guild_id = ?",
+  "query": "SELECT mod_log_channel_id, response_channel_id, accepted_role_id FROM guild_config WHERE guild_id = ?",
   "describe": {
     "columns": [
       {
@@ -9,7 +9,7 @@
         "type_info": "Text",
         "origin": {
           "Table": {
-            "table": "app_config",
+            "table": "guild_config",
             "name": "mod_log_channel_id"
           }
         }
@@ -20,7 +20,7 @@
         "type_info": "Text",
         "origin": {
           "Table": {
-            "table": "app_config",
+            "table": "guild_config",
             "name": "response_channel_id"
           }
         }
@@ -31,7 +31,7 @@
         "type_info": "Text",
         "origin": {
           "Table": {
-            "table": "app_config",
+            "table": "guild_config",
             "name": "accepted_role_id"
           }
         }
@@ -46,5 +46,5 @@
       true
     ]
   },
-  "hash": "6e2ac6b090f1ef339f88627b6e8fc2e776e50cf91052312e42cad6b3bf3f432f"
+  "hash": "23d682038d1afe2676e514d2980c0a764bc5588fb17829cb770c373dc929ce3f"
 }
