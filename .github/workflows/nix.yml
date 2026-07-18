@@ -23,8 +23,8 @@ on:
       - "Cargo.lock"
 
       # Folders
-      - ".sqlx"
-      - "migrations"
+      - ".sqlx/**"
+      - "migrations/**"
 
       # Workflows
       - ".github/workflows/nix.yml"
@@ -43,8 +43,8 @@ on:
       - "Cargo.lock"
       
       # Folders
-      - ".sqlx"
-      - "migrations"
+      - ".sqlx/**"
+      - "migrations/**"
 
       # Workflows
       - ".github/workflows/nix.yml"
