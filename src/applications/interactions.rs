@@ -1,3 +1,4 @@
+use crate::db::application::{get_application, set_application_status};
 use poise::serenity_prelude as serenity;
 
 pub async fn handle_component(
@@ -22,7 +23,7 @@ pub async fn handle_component(
         return Ok(());
     };
 
-    let Some(app) = crate::db::get_application(&data.db, app_id).await? else {
+    let Some(app) = get_application(&data.db, app_id).await? else {
         return Ok(());
     };
 
@@ -44,9 +45,9 @@ pub async fn handle_component(
     let applicant = serenity::UserId::new(applicant_id);
 
     if action == "accept" {
-        crate::db::set_application_status(&data.db, app_id, "accepted", component.user.id).await?;
+        set_application_status(&data.db, app_id, "accepted", component.user.id).await?;
 
-        let cfg = crate::db::get_app_config(&data.db, guild_id).await?;
+        let cfg = crate::db::appconfig::get_app_config(&data.db, guild_id).await?;
         if let Some(role_id) = cfg.and_then(|c| c.accepted_role)
             && let Ok(mut member) = guild_id.member(ctx, applicant).await
         {
@@ -67,7 +68,7 @@ pub async fn handle_component(
                 .await;
         }
     } else {
-        crate::db::set_application_status(&data.db, app_id, "denied", component.user.id).await?;
+        set_application_status(&data.db, app_id, "denied", component.user.id).await?;
 
         if let Ok(dm) = applicant.create_dm_channel(ctx).await {
             let _ = dm

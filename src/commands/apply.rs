@@ -1,3 +1,4 @@
+use crate::db::application::{has_pending_application, insert_application};
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 use std::fmt::Write;
@@ -70,7 +71,7 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
         return Ok(());
     };
 
-    if crate::db::has_pending_application(&ctx.data().db, guild_id, ctx.author().id).await? {
+    if has_pending_application(&ctx.data().db, guild_id, ctx.author().id).await? {
         ctx.send(
             poise::CreateReply::default()
                 .content("You already have a pending application.")
@@ -80,7 +81,7 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
         return Ok(());
     }
 
-    let cfg = crate::db::get_app_config(&ctx.data().db, guild_id).await?;
+    let cfg = crate::db::appconfig::get_app_config(&ctx.data().db, guild_id).await?;
     let Some(channel_id) = cfg.as_ref().and_then(|c| c.response_channel) else {
         ctx.send(
             poise::CreateReply::default()
@@ -177,7 +178,7 @@ pub async fn apply(ctx: Context<'_>) -> Result<(), Error> {
         .unwrap_or_default();
     let answers_json = serde_json::to_string(&answers)?;
 
-    let app_id = crate::db::insert_application(
+    let app_id = insert_application(
         &ctx.data().db,
         guild_id,
         ctx.author().id,

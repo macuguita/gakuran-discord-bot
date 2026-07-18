@@ -12,14 +12,14 @@ pub async fn handle_message_delete(
         return Ok(());
     };
 
-    let log_channel = crate::db::get_app_config(&data.db, guild_id)
+    let log_channel = crate::db::appconfig::get_app_config(&data.db, guild_id)
         .await?
         .and_then(|c| c.mod_log_channel);
     let Some(log_channel) = log_channel else {
         return Ok(());
     }; // not configured for this guild
 
-    if crate::db::is_auto_delete_channel(&data.db, guild_id, channel_id).await? {
+    if crate::db::auto_delete::is_auto_delete_channel(&data.db, guild_id, channel_id).await? {
         return Ok(());
     }
 
@@ -70,7 +70,7 @@ pub async fn handle_message_update(
         return Ok(());
     };
 
-    let log_channel = crate::db::get_app_config(&data.db, guild_id)
+    let log_channel = crate::db::appconfig::get_app_config(&data.db, guild_id)
         .await?
         .and_then(|c| c.mod_log_channel);
     let Some(log_channel) = log_channel else {
@@ -81,7 +81,7 @@ pub async fn handle_message_update(
         return Ok(());
     };
 
-    if crate::db::is_auto_delete_channel(&data.db, guild_id, new.channel_id).await? {
+    if crate::db::auto_delete::is_auto_delete_channel(&data.db, guild_id, new.channel_id).await? {
         return Ok(());
     }
 

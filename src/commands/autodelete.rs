@@ -1,3 +1,4 @@
+use crate::db::auto_delete::{add_auto_delete_channel, remove_auto_delete_channel};
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
@@ -15,7 +16,7 @@ pub async fn autodelete_add(
         ctx.say("This command only works in a server.").await?;
         return Ok(());
     };
-    crate::db::add_auto_delete_channel(&ctx.data().db, guild_id, channel.id()).await?;
+    add_auto_delete_channel(&ctx.data().db, guild_id, channel.id()).await?;
     ctx.say(format!(
         "Messages in <#{}> will now be auto-deleted.",
         channel.id()
@@ -38,7 +39,7 @@ pub async fn autodelete_remove(
         ctx.say("This command only works in a server.").await?;
         return Ok(());
     };
-    crate::db::remove_auto_delete_channel(&ctx.data().db, guild_id, channel.id()).await?;
+    remove_auto_delete_channel(&ctx.data().db, guild_id, channel.id()).await?;
     ctx.say(format!(
         "Messages in <#{}> will no longer be auto-deleted.",
         channel.id()

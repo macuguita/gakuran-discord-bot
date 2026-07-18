@@ -1,3 +1,4 @@
+use crate::db::appconfig::{set_app_config, get_app_config};
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
@@ -32,7 +33,7 @@ pub async fn appconfig(
         return Ok(());
     }
 
-    crate::db::set_app_config(
+    set_app_config(
         &ctx.data().db,
         guild_id,
         mod_log.as_ref().map(serenity::Channel::id),
@@ -41,7 +42,7 @@ pub async fn appconfig(
     )
     .await?;
 
-    let cfg = crate::db::get_app_config(&ctx.data().db, guild_id).await?;
+    let cfg = get_app_config(&ctx.data().db, guild_id).await?;
     let (chan_str, role_str, mod_log_str) = cfg.map_or(
         (
             "*(not set)*".into(),

@@ -1,3 +1,4 @@
+use crate::db::reaction_roles::set_reaction_role;
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
@@ -42,9 +43,8 @@ pub async fn reactionrole(
     msg.react(ctx, serenity::ReactionType::try_from(emoji.as_str())?)
         .await?;
 
-    let key = format!("{}:{}", msg.id, emoji);
     if let Some(guild_id) = ctx.guild_id() {
-        crate::db::set_reaction_role(&ctx.data().db, guild_id, &key, role.id.get()).await?;
+        set_reaction_role(&ctx.data().db, guild_id, msg.id, &emoji, role.id.get()).await?;
     }
 
     ctx.say("Done!").await?;

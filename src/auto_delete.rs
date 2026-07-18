@@ -1,3 +1,4 @@
+use crate::db::auto_delete::is_auto_delete_channel;
 use poise::serenity_prelude as serenity;
 
 pub async fn handle_message(
@@ -13,7 +14,7 @@ pub async fn handle_message(
         return Ok(());
     };
 
-    if crate::db::is_auto_delete_channel(&data.db, guild_id, msg.channel_id).await? {
+    if is_auto_delete_channel(&data.db, guild_id, msg.channel_id).await? {
         // The message itself can be a command like /apply (slash commands don't
         // show up as regular messages) or accidental chatter — either way, delete it
         msg.delete(ctx).await?;
