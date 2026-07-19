@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE tutor_applications SET status = ?, reviewed_by = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "75932beab0821ad4fefc860d014e039e0252c0f421a5b23c556b4ea7c24fb52f"
+}

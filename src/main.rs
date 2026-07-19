@@ -4,6 +4,7 @@ mod commands;
 mod config;
 mod db;
 mod embed;
+mod giveaway;
 mod mod_log;
 mod reaction_roles;
 
@@ -12,8 +13,7 @@ use config::Config;
 use poise::serenity_prelude as serenity;
 use std::collections::HashMap;
 
-type Error = Box<dyn std::error::Error + Send + Sync>;
-type Context<'a> = poise::Context<'a, Data, Error>;
+type Context<'a> = poise::Context<'a, Data, anyhow::Error>;
 
 pub struct Data {
     pub db: sqlx::SqlitePool,
@@ -23,9 +23,9 @@ pub struct Data {
 async fn event_handler(
     ctx: &serenity::Context,
     event: &serenity::FullEvent,
-    _framework: poise::FrameworkContext<'_, Data, Error>,
+    _framework: poise::FrameworkContext<'_, Data, anyhow::Error>,
     data: &Data,
-) -> Result<(), Error> {
+) -> Result<()> {
     match event {
         serenity::FullEvent::ReactionAdd { add_reaction } => {
             reaction_roles::handle_reaction_add(ctx, data, add_reaction).await?;
@@ -38,6 +38,8 @@ async fn event_handler(
         } => {
             embed::interactions::handle_component(ctx, data, component).await?;
             applications::interactions::handle_component(ctx, data, component).await?;
+            applications::tutor_interactions::handle_component(ctx, data, component).await?;
+            giveaway::interaction::handle_component(ctx, data, component).await?;
         }
         serenity::FullEvent::MessageDelete {
             channel_id,
@@ -70,13 +72,13 @@ async fn event_handler(
 }
 
 #[tokio::main]
-#[allow(clippy::unreadable_literal)]
 async fn main() -> Result<()> {
     let config = Config::from_env();
     let intents =
         serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT;
 
     let db_pool = db::init("gakuran-bot.db").await?;
+    let db_for_task = db_pool.clone();
 
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
@@ -88,6 +90,8 @@ async fn main() -> Result<()> {
                 commands::appconfig(),
                 commands::autodelete_add(),
                 commands::autodelete_remove(),
+                commands::applytutor(),
+                commands::giveaway(),
             ],
             event_handler: |ctx, event, framework, data| {
                 Box::pin(event_handler(ctx, event, framework, data))
@@ -116,10 +120,22 @@ async fn main() -> Result<()> {
     let mut cache_settings = serenity::cache::Settings::default();
     cache_settings.max_messages = 1000;
 
-    let client = serenity::ClientBuilder::new(config.token, intents)
+    let mut client = serenity::ClientBuilder::new(config.token, intents)
         .framework(framework)
         .cache_settings(cache_settings)
-        .await;
-    client.unwrap().start().await.unwrap();
+        .await?;
+    let http = client.http.clone();
+
+    tokio::spawn(async move {
+        loop {
+            tokio::time::sleep(std::time::Duration::from_secs(30)).await;
+            if let Err(e) = giveaway::process_due_giveaways(&http, &db_for_task).await {
+                eprintln!("Error processing giveaways: {e:?}");
+            }
+        }
+    });
+
+    client.start().await?;
+
     Ok(())
 }

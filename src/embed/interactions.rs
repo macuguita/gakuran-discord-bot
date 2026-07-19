@@ -1,4 +1,5 @@
 use super::buttons::build_button_rows;
+use anyhow::Result;
 use poise::serenity_prelude as serenity;
 
 #[allow(clippy::too_many_lines)]
@@ -6,7 +7,7 @@ pub async fn handle_component(
     ctx: &serenity::Context,
     data: &crate::Data,
     component: &serenity::ComponentInteraction,
-) -> Result<(), crate::Error> {
+) -> Result<()> {
     match component.data.custom_id.as_str() {
         "embed_post" => {
             let draft = {

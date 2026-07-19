@@ -1,4 +1,5 @@
-use crate::{Context, Error};
+use crate::Context;
+use anyhow::Result;
 use std::time::Instant;
 
 /// Check bot's ping
@@ -8,7 +9,7 @@ use std::time::Instant;
     required_permissions = "MANAGE_GUILD",
     default_member_permissions = "MANAGE_GUILD"
 )]
-pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
+pub async fn ping(ctx: Context<'_>) -> Result<()> {
     let start = Instant::now();
     let reply = ctx.say("Pong! 🏓").await?;
 

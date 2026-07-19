@@ -1,0 +1,21 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT COUNT(*) FROM tutor_applications WHERE guild_id = ? AND user_id = ? AND status = 'pending'",
+  "describe": {
+    "columns": [
+      {
+        "name": "COUNT(*)",
+        "ordinal": 0,
+        "type_info": "Integer",
+        "origin": "Expression"
+      }
+    ],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "7c3f3dafbae83bb54d0449f6f49848c5108bc378ea688c524c6ab70e5bd2f75e"
+}

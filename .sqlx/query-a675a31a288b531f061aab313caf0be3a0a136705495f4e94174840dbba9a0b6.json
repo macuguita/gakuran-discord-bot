@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO giveaway_entries (giveaway_id, user_id) VALUES (?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "a675a31a288b531f061aab313caf0be3a0a136705495f4e94174840dbba9a0b6"
+}

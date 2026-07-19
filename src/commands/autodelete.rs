@@ -1,5 +1,6 @@
+use crate::Context;
 use crate::db::auto_delete::{add_auto_delete_channel, remove_auto_delete_channel};
-use crate::{Context, Error};
+use anyhow::Result;
 use poise::serenity_prelude as serenity;
 
 /// Add a channel to the auto-delete list (only /apply usage allowed there)
@@ -11,7 +12,7 @@ use poise::serenity_prelude as serenity;
 pub async fn autodelete_add(
     ctx: Context<'_>,
     #[description = "Channel to auto-clean"] channel: serenity::Channel,
-) -> Result<(), Error> {
+) -> Result<()> {
     let Some(guild_id) = ctx.guild_id() else {
         ctx.say("This command only works in a server.").await?;
         return Ok(());
@@ -34,7 +35,7 @@ pub async fn autodelete_add(
 pub async fn autodelete_remove(
     ctx: Context<'_>,
     #[description = "Channel to stop auto-cleaning"] channel: serenity::Channel,
-) -> Result<(), Error> {
+) -> Result<()> {
     let Some(guild_id) = ctx.guild_id() else {
         ctx.say("This command only works in a server.").await?;
         return Ok(());

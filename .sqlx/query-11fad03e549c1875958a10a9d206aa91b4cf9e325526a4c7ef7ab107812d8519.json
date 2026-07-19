@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "UPDATE giveaways SET message_id = ? WHERE id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "11fad03e549c1875958a10a9d206aa91b4cf9e325526a4c7ef7ab107812d8519"
+}

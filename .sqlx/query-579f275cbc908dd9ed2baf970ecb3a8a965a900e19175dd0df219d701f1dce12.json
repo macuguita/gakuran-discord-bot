@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "DELETE FROM giveaway_entries WHERE giveaway_id = ? AND user_id = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "579f275cbc908dd9ed2baf970ecb3a8a965a900e19175dd0df219d701f1dce12"
+}

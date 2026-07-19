@@ -1,13 +1,13 @@
+use anyhow::Result;
 use poise::serenity_prelude as serenity;
 
-#[allow(clippy::unreadable_literal)]
 pub async fn handle_message_delete(
     ctx: &serenity::Context,
     data: &crate::Data,
     channel_id: serenity::ChannelId,
     deleted_message_id: serenity::MessageId,
     guild_id: Option<serenity::GuildId>,
-) -> Result<(), crate::Error> {
+) -> Result<()> {
     let Some(guild_id) = guild_id else {
         return Ok(());
     };
@@ -31,7 +31,7 @@ pub async fn handle_message_delete(
     let embed = match cached {
         Some((author, content)) => serenity::CreateEmbed::new()
             .title("Message Deleted")
-            .color(0xED4245)
+            .color(0xED_42_45)
             .field("Author", author, true)
             .field("Channel", format!("<#{channel_id}>"), true)
             .field(
@@ -46,7 +46,7 @@ pub async fn handle_message_delete(
             .timestamp(serenity::Timestamp::now()),
         None => serenity::CreateEmbed::new()
             .title("Message Deleted")
-            .color(0xED4245)
+            .color(0xED_42_45)
             .field("Channel", format!("<#{channel_id}>"), true)
             .description("*(message not in cache — content unknown)*")
             .timestamp(serenity::Timestamp::now()),
@@ -58,14 +58,13 @@ pub async fn handle_message_delete(
     Ok(())
 }
 
-#[allow(clippy::unreadable_literal)]
 pub async fn handle_message_update(
     ctx: &serenity::Context,
     data: &crate::Data,
     old_if_available: Option<&serenity::Message>,
     new: Option<&serenity::Message>,
     guild_id: Option<serenity::GuildId>,
-) -> Result<(), crate::Error> {
+) -> Result<()> {
     let Some(guild_id) = guild_id else {
         return Ok(());
     };
@@ -94,7 +93,7 @@ pub async fn handle_message_update(
 
     let embed = serenity::CreateEmbed::new()
         .title("Message Edited")
-        .color(0xFAA61A)
+        .color(0xFA_A6_1A)
         .field("Author", new.author.tag(), true)
         .field("Channel", format!("<#{}>", new.channel_id), true)
         .field(

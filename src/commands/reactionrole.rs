@@ -1,5 +1,6 @@
+use crate::Context;
 use crate::db::reaction_roles::set_reaction_role;
-use crate::{Context, Error};
+use anyhow::Result;
 use poise::serenity_prelude as serenity;
 
 /// Post a reaction-role message, or attach one to an existing message
@@ -14,7 +15,7 @@ pub async fn reactionrole(
     #[description = "Emoji to react with"] emoji: String,
     #[description = "Content for a new message"] message_content: Option<String>,
     #[description = "ID of an existing message to react to instead"] message_id: Option<String>,
-) -> Result<(), Error> {
+) -> Result<()> {
     ctx.defer_ephemeral().await?;
 
     let msg = match (message_content, message_id) {
@@ -33,10 +34,15 @@ pub async fn reactionrole(
         }
         (Some(content), None) => ctx.channel_id().say(ctx, content).await?,
         (None, Some(id_str)) => {
-            let msg_id: u64 = id_str.parse().map_err(|_| "Invalid message ID")?;
-            ctx.channel_id()
-                .message(ctx, serenity::MessageId::new(msg_id))
-                .await?
+            if let Ok(msg_id) = id_str.parse() {
+                ctx.channel_id()
+                    .message(ctx, serenity::MessageId::new(msg_id))
+                    .await?
+            } else {
+                ctx.say(format!("`{id_str}` isn't a valid message ID."))
+                    .await?;
+                return Ok(());
+            }
         }
     };
 

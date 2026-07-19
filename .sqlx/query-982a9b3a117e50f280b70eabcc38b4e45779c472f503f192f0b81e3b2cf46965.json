@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO giveaways (guild_id, channel_id, prize, winner_count, end_time, host_id)\n         VALUES (?, ?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "982a9b3a117e50f280b70eabcc38b4e45779c472f503f192f0b81e3b2cf46965"
+}

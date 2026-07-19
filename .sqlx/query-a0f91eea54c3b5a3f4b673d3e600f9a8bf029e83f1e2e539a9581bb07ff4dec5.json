@@ -1,0 +1,38 @@
+{
+  "db_name": "SQLite",
+  "query": "SELECT user_id, status FROM tutor_applications WHERE id = ?",
+  "describe": {
+    "columns": [
+      {
+        "name": "user_id",
+        "ordinal": 0,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "tutor_applications",
+            "name": "user_id"
+          }
+        }
+      },
+      {
+        "name": "status",
+        "ordinal": 1,
+        "type_info": "Text",
+        "origin": {
+          "Table": {
+            "table": "tutor_applications",
+            "name": "status"
+          }
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "a0f91eea54c3b5a3f4b673d3e600f9a8bf029e83f1e2e539a9581bb07ff4dec5"
+}

@@ -1,7 +1,9 @@
 pub mod appconfig;
 pub mod application;
 pub mod auto_delete;
+pub mod giveaway;
 pub mod reaction_roles;
+pub mod tutor_application;
 
 use sqlx::SqlitePool;
 

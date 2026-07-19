@@ -1,63 +1,81 @@
+use super::apply::Question;
 use crate::Context;
-use crate::db::application::{has_pending_application, insert_application};
+use crate::db::tutor_application::{has_pending_application, insert_application};
 use anyhow::Result;
 use poise::serenity_prelude as serenity;
 use std::fmt::Write;
 use std::time::Duration;
 
-pub struct Question {
-    pub key: &'static str,
-    pub prompt: &'static str,
-    pub min_len: Option<usize>,
-    pub max_len: Option<usize>,
-}
-
 const QUESTIONS: &[Question] = &[
     Question {
-        key: "roblox_username",
-        prompt: "What is your Roblox username?",
+        key: "subjects",
+        prompt: "What subjects are you comfortable teaching, and what is the highest level you've completed in each?",
         min_len: None,
         max_len: None,
     },
     Question {
-        key: "in_game_name",
-        prompt: "What is your in-game character's name?",
+        key: "why_teach",
+        prompt: "Why do you want to become a teacher for this server?",
         min_len: None,
         max_len: None,
     },
     Question {
-        key: "character_backstory",
-        prompt: "Tell us a little bit about your character.",
-        min_len: Some(185),
-        max_len: None,
-    },
-    Question {
-        key: "age",
-        prompt: "How old are you?",
-        min_len: None,
-        max_len: Some(2),
-    },
-    Question {
-        key: "uses_vc",
-        prompt: "Do you mainly use voice chat or text chat?",
+        key: "when_helped",
+        prompt: "Describe a time you helped someone understand a difficult concept. What approach did you use?",
         min_len: None,
         max_len: None,
     },
     Question {
-        key: "roleplay_experience",
-        prompt: "Tell us about your roleplay experience. Minimum of 2 sentences.",
-        min_len: Some(200),
+        key: "handle_situation",
+        prompt: "Imagine you're leading a teaching session and a few students keep talking over you, distracting others who are trying to learn. How would you handle the situation while keeping the session respectful and productive?",
+        min_len: None,
         max_len: None,
     },
     Question {
-        key: "why_join",
-        prompt: "Tell us why you wanna join our community.",
-        min_len: Some(150),
+        key: "unknown_answer",
+        prompt: "How would you respond if you didn't know the answer to a student's question?",
+        min_len: None,
         max_len: None,
     },
     Question {
-        key: "rule",
-        prompt: "What is the servers 3rd rule?",
+        key: "great_teacher_qualities",
+        prompt: "What do you think makes a great teacher? List 3-5 qualities and briefly explain why they matter.",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "frustrated_student",
+        prompt: "How would you handle a student who becomes frustrated, discouraged, or says, \"I'm just not smart enough for this\"?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "balance_responsibilities",
+        prompt: "Teachers in this server are volunteers and are expected to be dependable. How will you balance teaching responsibilities with your life?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "teach_a_concept",
+        prompt: "Choose a concept from one of the subjects you want to teach and explain it as if you're teaching it to someone learning it for the first time.",
+        min_len: Some(600),
+        max_len: Some(800),
+    },
+    Question {
+        key: "available_days",
+        prompt: "What days of the week are you generally available?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "available_hours",
+        prompt: "How many hours can you be active for your available days?",
+        min_len: None,
+        max_len: None,
+    },
+    Question {
+        key: "additional_info",
+        prompt: "Is there anything else you'd like us to know that would help us understand why you'd be a good teacher in this community?",
         min_len: None,
         max_len: None,
     },
@@ -65,7 +83,7 @@ const QUESTIONS: &[Question] = &[
 
 #[poise::command(slash_command)]
 #[allow(clippy::too_many_lines)]
-pub async fn apply(ctx: Context<'_>) -> Result<()> {
+pub async fn applytutor(ctx: Context<'_>) -> Result<()> {
     let Some(guild_id) = ctx.guild_id() else {
         ctx.say("This command can only be used inside of a server.")
             .await?;
@@ -141,7 +159,7 @@ pub async fn apply(ctx: Context<'_>) -> Result<()> {
                 dm_channel
                     .say(
                         ctx,
-                        "You took too long to respond. Use `/apply` to start again.",
+                        "You took too long to respond. Use `/applytutor` to start again.",
                     )
                     .await?;
                 return Ok(());
@@ -172,21 +190,10 @@ pub async fn apply(ctx: Context<'_>) -> Result<()> {
         }
     }
 
-    let in_game_name = answers
-        .iter()
-        .find(|(k, _)| k == "in_game_name")
-        .map(|(_, v)| v.clone())
-        .unwrap_or_default();
     let answers_json = serde_json::to_string(&answers)?;
 
-    let app_id = insert_application(
-        &ctx.data().db,
-        guild_id,
-        ctx.author().id,
-        &in_game_name,
-        &answers_json,
-    )
-    .await?;
+    let app_id =
+        insert_application(&ctx.data().db, guild_id, ctx.author().id, &answers_json).await?;
 
     let author = ctx.author();
 
@@ -208,7 +215,6 @@ pub async fn apply(ctx: Context<'_>) -> Result<()> {
     let embed = serenity::CreateEmbed::default()
         .title(format!("Application from {}", author.name))
         .field("Discord user", format!("<@{}>", author.id), true)
-        .field("In-game name", &in_game_name, true)
         .description("Full responses attached below.")
         .footer(serenity::CreateEmbedFooter::new(format!(
             "Application #{app_id}"
@@ -216,10 +222,10 @@ pub async fn apply(ctx: Context<'_>) -> Result<()> {
         .color(0x58_65_F2);
 
     let buttons = serenity::CreateActionRow::Buttons(vec![
-        serenity::CreateButton::new(format!("app_accept_{app_id}"))
+        serenity::CreateButton::new(format!("tutor_app_accept_{app_id}"))
             .label("Accept")
             .style(serenity::ButtonStyle::Success),
-        serenity::CreateButton::new(format!("app_deny_{app_id}"))
+        serenity::CreateButton::new(format!("tutor_app_deny_{app_id}"))
             .label("Deny")
             .style(serenity::ButtonStyle::Danger),
     ]);

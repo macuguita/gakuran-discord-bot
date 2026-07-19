@@ -1,5 +1,6 @@
+use crate::Data;
 use crate::embed::{EmbedDraft, buttons::build_button_rows};
-use crate::{Data, Error};
+use anyhow::Result;
 use poise::Modal;
 
 #[derive(Debug, poise::Modal)]
@@ -19,7 +20,7 @@ struct EmbedBasicsModal {
     required_permissions = "MANAGE_MESSAGES",
     default_member_permissions = "MANAGE_MESSAGES"
 )]
-pub async fn embed(ctx: poise::ApplicationContext<'_, Data, Error>) -> Result<(), Error> {
+pub async fn embed(ctx: poise::ApplicationContext<'_, Data, anyhow::Error>) -> Result<()> {
     let data = EmbedBasicsModal::execute(ctx).await?;
     let Some(data) = data else {
         return Ok(());

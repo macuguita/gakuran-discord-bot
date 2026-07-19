@@ -16,9 +16,8 @@ pub struct EmbedDraft {
 }
 
 impl EmbedDraft {
-    #[allow(clippy::unreadable_literal)]
     pub fn to_embed(&self) -> serenity::CreateEmbed {
-        let mut e = serenity::CreateEmbed::new().color(self.color.unwrap_or(0x5865F2));
+        let mut e = serenity::CreateEmbed::new().color(self.color.unwrap_or(0x58_65_F2));
         if let Some(t) = &self.title {
             e = e.title(t);
         }

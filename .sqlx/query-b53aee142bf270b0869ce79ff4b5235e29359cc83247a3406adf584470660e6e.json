@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO tutor_applications (guild_id, user_id, answers) VALUES (?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "b53aee142bf270b0869ce79ff4b5235e29359cc83247a3406adf584470660e6e"
+}
