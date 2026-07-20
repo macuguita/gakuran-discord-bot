@@ -32,7 +32,7 @@ pub async fn appconfig(
         return Ok(());
     };
 
-    if application_channel.is_none() && application_approved_role.is_none() && mod_log.is_none() {
+    if application_channel.is_none() && application_approved_role.is_none() && mod_log.is_none() && tutor_application_channel.is_none() && tutor_application_approved_role.is_none() {
         ctx.say("Provide at least a channel, a role, or a mod log channel to update.")
             .await?;
         return Ok(());

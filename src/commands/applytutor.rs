@@ -101,7 +101,7 @@ pub async fn applytutor(ctx: Context<'_>) -> Result<()> {
     }
 
     let cfg = crate::db::appconfig::get_app_config(&ctx.data().db, guild_id).await?;
-    let Some(channel_id) = cfg.as_ref().and_then(|c| c.response_channel) else {
+    let Some(channel_id) = cfg.as_ref().and_then(|c| c.tutor_response_channel) else {
         ctx.send(
             poise::CreateReply::default()
                 .content("Applications have not been set up for this server yet.")
