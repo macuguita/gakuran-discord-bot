@@ -24,6 +24,8 @@ pub async fn appconfig(
     tutor_application_channel: Option<serenity::Channel>,
     #[description = "Role given when a tutor application is accepted"]
     tutor_application_approved_role: Option<serenity::Role>,
+    #[description = "Role given when someone joins, and removed when their application has been accepted"]
+    auto_role: Option<serenity::Role>,
 ) -> Result<()> {
     ctx.defer_ephemeral().await?;
 
@@ -32,7 +34,7 @@ pub async fn appconfig(
         return Ok(());
     };
 
-    if application_channel.is_none() && application_approved_role.is_none() && mod_log.is_none() && tutor_application_channel.is_none() && tutor_application_approved_role.is_none() {
+    if application_channel.is_none() && application_approved_role.is_none() && mod_log.is_none() && tutor_application_channel.is_none() && tutor_application_approved_role.is_none() && auto_role.is_none() {
         ctx.say("Provide at least a channel, a role, or a mod log channel to update.")
             .await?;
         return Ok(());
@@ -48,13 +50,15 @@ pub async fn appconfig(
             .as_ref()
             .map(serenity::Channel::id),
         tutor_application_approved_role.as_ref().map(|r| r.id),
+        auto_role.as_ref().map(|r| r.id),
     )
     .await?;
 
     let cfg = get_app_config(&ctx.data().db, guild_id).await?;
-    let (mod_log_str, app_chan_str, app_role_str, tutor_app_channel_str, tutor_app_role_str) = cfg
+    let (mod_log_str, app_chan_str, app_role_str, tutor_app_channel_str, tutor_app_role_str, auto_role_str) = cfg
         .map_or(
             (
+                "*(not set)*".into(),
                 "*(not set)*".into(),
                 "*(not set)*".into(),
                 "*(not set)*".into(),
@@ -73,6 +77,8 @@ pub async fn appconfig(
                         .map_or("*(not set)*".into(), |c| format!("<#{c}>")),
                     c.tutor_accepted_role
                         .map_or("*(not set)*".into(), |r| format!("<@&{r}>")),
+                    c.auto_role
+                        .map_or("*(not set)*".into(), |r| format!("<@&{r}>")),
                 )
             },
         );
@@ -82,7 +88,8 @@ pub async fn appconfig(
 Application channel: {app_chan_str}
 Accepted role: {app_role_str}
 Tutor application channel: {tutor_app_channel_str}
-Tutor accepted role: {tutor_app_role_str}"
+Tutor accepted role: {tutor_app_role_str}
+Auto role: {auto_role_str}"
     ))
     .await?;
     Ok(())

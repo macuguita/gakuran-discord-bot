@@ -7,6 +7,7 @@ pub struct AppConfig {
     pub accepted_role: Option<serenity::RoleId>,
     pub tutor_response_channel: Option<serenity::ChannelId>,
     pub tutor_accepted_role: Option<serenity::RoleId>,
+    pub auto_role: Option<serenity::RoleId>,
 }
 
 pub async fn get_app_config(
@@ -15,7 +16,7 @@ pub async fn get_app_config(
 ) -> Result<Option<AppConfig>, sqlx::Error> {
     let guild_id_str = guild_id.get().to_string();
     let row = sqlx::query!(
-        "SELECT mod_log_channel_id, response_channel_id, accepted_role_id, tutor_response_channel_id, tutor_accepted_role_id FROM guild_config WHERE guild_id = ?",
+        "SELECT mod_log_channel_id, response_channel_id, accepted_role_id, tutor_response_channel_id, tutor_accepted_role_id, auto_role_id FROM guild_config WHERE guild_id = ?",
         guild_id_str
     )
     .fetch_optional(pool)
@@ -42,9 +43,14 @@ pub async fn get_app_config(
             .tutor_accepted_role_id
             .and_then(|r| r.parse().ok())
             .map(serenity::RoleId::new),
+        auto_role: r
+            .auto_role_id
+            .and_then(|r| r.parse().ok())
+            .map(serenity::RoleId::new),
     }))
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn set_app_config(
     pool: &SqlitePool,
     guild_id: serenity::GuildId,
@@ -53,6 +59,7 @@ pub async fn set_app_config(
     accepted_role: Option<serenity::RoleId>,
     tutor_response_channel: Option<serenity::ChannelId>,
     tutor_accepted_role: Option<serenity::RoleId>,
+    auto_role: Option<serenity::RoleId>,
 ) -> Result<(), sqlx::Error> {
     let guild_id_str = guild_id.get().to_string();
     let mod_log_str = mod_log_channel.map(|c| c.get().to_string());
@@ -60,21 +67,24 @@ pub async fn set_app_config(
     let accepted_role_str = accepted_role.map(|r| r.get().to_string());
     let tutor_response_channel_str = tutor_response_channel.map(|c| c.get().to_string());
     let tutor_accepted_role_str = tutor_accepted_role.map(|r| r.get().to_string());
+    let auto_role_str = auto_role.map(|r| r.get().to_string());
 
     sqlx::query!(
-        "INSERT INTO guild_config (guild_id, mod_log_channel_id, response_channel_id, accepted_role_id, tutor_response_channel_id, tutor_accepted_role_id) VALUES (?, ?, ?, ?, ?, ?)
+        "INSERT INTO guild_config (guild_id, mod_log_channel_id, response_channel_id, accepted_role_id, tutor_response_channel_id, tutor_accepted_role_id, auto_role_id) VALUES (?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(guild_id) DO UPDATE SET
             mod_log_channel_id = COALESCE(excluded.mod_log_channel_id, guild_config.mod_log_channel_id),
             response_channel_id = COALESCE(excluded.response_channel_id, guild_config.response_channel_id),
             accepted_role_id = COALESCE(excluded.accepted_role_id, guild_config.accepted_role_id),
             tutor_response_channel_id = COALESCE(excluded.tutor_response_channel_id, guild_config.tutor_response_channel_id),
-            tutor_accepted_role_id = COALESCE(excluded.tutor_accepted_role_id, guild_config.tutor_accepted_role_id)",
+            tutor_accepted_role_id = COALESCE(excluded.tutor_accepted_role_id, guild_config.tutor_accepted_role_id),
+            auto_role_id = COALESCE(excluded.auto_role_id, guild_config.auto_role_id)",
         guild_id_str,
         mod_log_str,
         response_channel_str,
         accepted_role_str,
         tutor_response_channel_str,
         tutor_accepted_role_str,
+        auto_role_str,
     )
     .execute(pool)
     .await?;

@@ -49,10 +49,12 @@ pub async fn handle_component(
         set_application_status(&data.db, app_id, "accepted", component.user.id).await?;
 
         let cfg = crate::db::appconfig::get_app_config(&data.db, guild_id).await?;
-        if let Some(role_id) = cfg.and_then(|c| c.accepted_role)
+        if let Some(role_id) = cfg.as_ref().and_then(|c| c.accepted_role)
+            && let Some(auto_role_id) = cfg.as_ref().and_then(|c| c.auto_role)
             && let Ok(mut member) = guild_id.member(ctx, applicant).await
         {
             let _ = member.add_role(ctx, role_id).await;
+            let _ = member.remove_role(ctx, auto_role_id).await;
             let _ = member
                 .edit(ctx, serenity::EditMember::new().nickname(&app.in_game_name))
                 .await;

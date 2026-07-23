@@ -7,6 +7,7 @@ mod embed;
 mod giveaway;
 mod mod_log;
 mod reaction_roles;
+mod auto_role;
 
 use anyhow::Result;
 use config::Config;
@@ -65,6 +66,9 @@ async fn event_handler(
         }
         serenity::FullEvent::Message { new_message } => {
             auto_delete::handle_message(ctx, data, new_message).await?;
+        }
+        serenity::FullEvent::GuildMemberAddition { new_member } => {
+            auto_role::handle_new_member(ctx, data, new_member).await?;
         }
         _ => {}
     }
